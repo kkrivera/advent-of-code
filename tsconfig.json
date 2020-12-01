@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "importHelpers": true,
+    "moduleResolution": "Node",
+    "target": "ES2017",
+    "module": "commonjs",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["ES2015", "DOM"]
+  }
+}
