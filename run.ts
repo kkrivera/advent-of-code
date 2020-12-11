@@ -4,7 +4,7 @@ export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Paramet
   const runtimes = [];
   let lastResult;
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 100; i++) {
     const clonedInputs = cloneDeep(inputs);
     const start = new Date();
     const result = fn.apply(fn, clonedInputs);
