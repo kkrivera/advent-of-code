@@ -92,6 +92,31 @@ function part2(input: number[]) {
   }, 1);
 }
 
+function part2Paths(input: number[]) {
+  const sortedInput = input.sort((a, b) => a - b);
+  const set = new Set(input);
+
+  const pathCounts = [0];
+  const lookBackIter = [1, 2, 3];
+
+  let sum = 0;
+  for (let i = 1; i <= sortedInput[sortedInput.length - 1] + 1; i++) {
+    if (set.has(i)) {
+      if (i < 4) {
+        sum = pathCounts.reduce((acc, cur) => acc + cur, 0);
+        pathCounts.push(1 + sum);
+      } else {
+        sum = lookBackIter.reduce((acc, j) => acc + pathCounts[i - j], 0);
+        pathCounts.push(sum);
+      }
+    } else {
+      pathCounts.push(0);
+    }
+  }
+
+  return sum;
+}
+
 const providedInput = `26
 97
 31
@@ -190,4 +215,4 @@ const providedInput = `26
 const input = providedInput.split('\n').map((intStr) => parseInt(intStr));
 
 run(part1, input);
-run(part2, input);
+run(part2Paths, input);
