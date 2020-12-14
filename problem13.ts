@@ -4,7 +4,6 @@ interface Eqn {
   b: number;
   m: number;
   d: number;
-  mFactorEqn: { m: number; b: number };
 }
 
 function part1(input: [number, number[]]) {
@@ -26,7 +25,7 @@ function part1(input: [number, number[]]) {
   return timeAfter * matchedBusId;
 }
 
-function brutePart2(input: number[]) {
+function bruteForceFindFirstSequence(input: number[]) {
   const busIds = input;
 
   const validBusIdIdxs = busIds.reduce((acc, cur, i) => {
@@ -55,78 +54,6 @@ function brutePart2(input: number[]) {
   return start;
 }
 
-function evalMFactor(eq1: Eqn, eq2: Eqn, x1: number = 0) {
-  const { a: a1, b: b1, m: m1, d: d1 } = eq1;
-  const { a: a2, b: b2, m: m2 } = eq2;
-  return (a1 * (m1 * x1 + b1) + d1 - a2 * b2) / (a2 * m2);
-}
-
-function assignMFactor(eq1: Eqn, eq2: Eqn) {
-  const { m: m2 } = eq2;
-  let x1 = 0;
-  let n: number;
-  do {
-    n = evalMFactor(eq1, eq2, ++x1);
-  } while (n <= 0 || n % 1 !== 0);
-
-  eq1.mFactorEqn.m = m2; // 59
-  eq1.mFactorEqn.b = x1; // 62
-}
-
-function part2(input: [number, number[]]) {
-  const [, busIds] = input;
-
-  let [last] = busIds;
-  const sections: number[][] = [[last]];
-  let idx = 0;
-  for (let i = 1; i < busIds.length; i++) {
-    const busId = busIds[i];
-
-    if (busId > 0) {
-      sections[idx].push(busId);
-      last = busId;
-      if (i < busIds.length - 1) {
-        sections.push([busId]);
-        idx++;
-      }
-    } else {
-      sections[idx].push(0);
-    }
-  }
-
-  const equations: Eqn[] = sections.map((range) => {
-    const minSequenceStart = brutePart2(range);
-    const [a, m] = range.filter((val) => val > 0);
-    return { a, m, b: minSequenceStart / a, d: range.length - 1, mFactorEqn: { m: -1, b: -1 } } as Eqn;
-  });
-
-  // Create equations for getting whole number factors
-  for (let i = 0; i < equations.length - 1; i++) {
-    assignMFactor(equations[i], equations[i + 1]);
-  }
-
-  let found = false;
-  let mFactor = 0;
-  const [eq1] = equations;
-  const { m: m1, b: b1 } = eq1.mFactorEqn;
-  let x;
-  while (!found) {
-    found = true;
-    x = b1 + m1 * mFactor++;
-    let test = x;
-    for (let i = 0; i < equations.length - 1; i++) {
-      test = evalMFactor(equations[i], equations[i + 1], test);
-      if (test % 1 !== 0) {
-        found = false;
-        break;
-      }
-    }
-  }
-
-  const { a, m, b } = eq1;
-  return a * (m * x + b);
-}
-
 // Find greatest common denominator
 function gcd(...numbers: number[]) {
   let [a, b] = numbers;
@@ -153,6 +80,46 @@ function lcm(...numbers: number[]) {
   // Recursively find the LCM among a list of
   if (numbers.length > 2) return lcm(a, lcm.apply(this, numbers.slice(1)));
   return Math.abs(a * b) / gcd(a, b);
+}
+
+function rangeToEqn(range: number[]): Eqn {
+  const minSequenceStart = bruteForceFindFirstSequence(range);
+  const [a, m] = range.filter((val) => val > 0);
+  return { a, m, b: minSequenceStart / a, d: range.length - 1 } as Eqn;
+}
+
+function getNextEqn({ a, b, m }: Eqn, range: number[]): Eqn {
+  let x = 0;
+  let minSequenceStart;
+  const d = range.length - 1;
+  const rangeEnd = range[range.length - 1];
+  while (true) {
+    minSequenceStart = a * (b + m * x++);
+    if ((minSequenceStart + d) % rangeEnd === 0) {
+      break;
+    }
+  }
+
+  return { a, m: lcm(m, rangeEnd), b: minSequenceStart / a, d } as Eqn;
+}
+
+function part2(input: [number, number[]]) {
+  const [, busIds] = input;
+
+  let range = [busIds[0]];
+  let eq;
+  for (let i = 1; i < busIds.length; i++) {
+    const busId = busIds[i];
+    range.push(busId);
+    if (busId > 0) {
+      // Initialize our first equation or build off the last
+      if (!eq) eq = rangeToEqn(range);
+      else eq = getNextEqn(eq, range);
+    }
+  }
+
+  const { a, b } = eq;
+  return a * b;
 }
 
 const providedInput = `1000390
