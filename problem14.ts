@@ -1,3 +1,5 @@
+import { run } from './run';
+
 interface Operation {
   loc: number;
   bin: number[];
@@ -30,7 +32,10 @@ function toBin(dec: number): number[] {
 
 function toDec(bin: number[]) {
   const powOffset = bin.length - 1;
-  return bin.reduce((acc, val, power) => acc + val * Math.pow(2, powOffset - power), 0);
+  return bin.reduce(
+    (acc, val, power) => acc + val * Math.pow(2, powOffset - power),
+    0
+  );
 }
 
 function extrapolateBin(pow: number) {
@@ -726,5 +731,5 @@ const input = providedInput.split('\n').reduce((acc, line) => {
   return acc;
 }, [] as Input[]);
 
-console.log(part1(input));
-console.log(part2(input));
+run(part1, input);
+run(part2, input);
