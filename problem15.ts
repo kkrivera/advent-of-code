@@ -16,8 +16,9 @@ function part1(input: number[], place: number = 2020) {
 }
 
 const providedInput = '8,0,17,4,1,12';
-const exampleInput1 = '0,3,6';
 const input = providedInput.split(',').map((num) => parseInt(num));
 
 console.log(part1(input));
 console.log(part1(input, 30000000));
+
+export {}
