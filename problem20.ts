@@ -1,4 +1,5 @@
 import * as cloneDeep from 'clone-deep';
+import { run } from './run';
 
 type Side = 'left' | 'right' | 'top' | 'bottom';
 type Rotation = 'CCW' | 'CW';
@@ -2241,6 +2242,6 @@ function processInput(input: string): Tiles {
 }
 
 const input = processInput(providedInput);
-console.log(part1(cloneDeep(input)));
-console.log(part2(cloneDeep(input)));
+run(part1, input);
+run(part2, input);
 export {};
