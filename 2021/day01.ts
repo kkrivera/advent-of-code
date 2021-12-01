@@ -23,18 +23,5 @@ const fullInput = readFileSync("./day01-input", "utf-8")
   .split("\n")
   .map((line) => parseInt(line));
 
-const exampleInput = `199
-200
-208
-210
-200
-207
-240
-269
-260
-263`
-  .split("\n")
-  .map((line) => parseInt(line));
-
 run(part1, fullInput);
 run(part2, fullInput);
