@@ -21,8 +21,11 @@ export function run<T extends (...args: any[]) => any>(
     }
   }
 
-  const averageRuntime =
+  let averageRuntime =
     runtimes.reduce((acc, cur) => acc + cur, 0) / runtimes.length;
+
+  const precision = 10000;
+  averageRuntime = Math.floor(averageRuntime * precision) / precision;
 
   console.log(`${fn.name}: ${lastResult} -- ${averageRuntime}ms`);
 }
