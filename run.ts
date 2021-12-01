@@ -1,35 +1,31 @@
-import * as cloneDeep from "clone-deep";
+import * as cloneDeep from 'clone-deep';
 
-export function run<T extends (...args: any[]) => any>(
-  fn: T,
-  ...inputs: Parameters<T>
-) {
-  const runtimes = [];
+export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Parameters<T>) {
+  const runTimes = [];
   let lastResult;
 
   for (let i = 0; i < 100; i++) {
     const clonedInputs = cloneDeep(inputs);
     const start = process.hrtime();
-    const result = fn.apply(fn, clonedInputs);
-    const diff = hrTimeToMs(process.hrtime(start));
+    const result = fn(...clonedInputs);
+    const runTime = hrTimeToMs(process.hrtime(start));
 
     if (lastResult !== undefined && result !== lastResult) {
-      throw new Error("Answers do not match!!!");
+      throw new Error('Answers do not match!!!');
     } else {
       lastResult = result;
-      runtimes.push(diff);
+      runTimes.push(runTime);
     }
   }
 
-  let averageRuntime =
-    runtimes.reduce((acc, cur) => acc + cur, 0) / runtimes.length;
-
+  // Calculate average runtime and reduce precision with Math.floor
   const precision = 10000;
-  averageRuntime = Math.floor(averageRuntime * precision) / precision;
+  const averageRunTime = runTimes.reduce((acc, cur) => acc + cur, 0) / runTimes.length;
+  const reducedPrecisionAverageRunTime = Math.floor(averageRunTime * precision) / precision;
 
-  console.log(`${fn.name}: ${lastResult} -- ${averageRuntime}ms`);
+  console.log(`${fn.name}: ${lastResult} -- ${reducedPrecisionAverageRunTime}ms`);
 }
 
-function hrTimeToMs(hrTime: [number, number]) {
-  return hrTime[0] * 1000 + hrTime[1] / 1000000;
+function hrTimeToMs([seconds, nanoseconds]: [number, number]) {
+  return seconds * 1000 + nanoseconds / 1000000;
 }
