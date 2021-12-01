@@ -1,24 +1,32 @@
-import * as cloneDeep from 'clone-deep';
+import * as cloneDeep from "clone-deep";
 
-export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Parameters<T>) {
+export function run<T extends (...args: any[]) => any>(
+  fn: T,
+  ...inputs: Parameters<T>
+) {
   const runtimes = [];
   let lastResult;
 
   for (let i = 0; i < 100; i++) {
     const clonedInputs = cloneDeep(inputs);
-    const start = new Date();
+    const start = process.hrtime();
     const result = fn.apply(fn, clonedInputs);
-    const end = new Date();
+    const diff = hrTimeToMs(process.hrtime(start));
 
     if (lastResult !== undefined && result !== lastResult) {
-      throw new Error('Answers do not match!!!');
+      throw new Error("Answers do not match!!!");
     } else {
       lastResult = result;
-      runtimes.push(end.getTime() - start.getTime());
+      runtimes.push(diff);
     }
   }
 
-  const averageRuntime = runtimes.reduce((acc, cur) => acc + cur, 0) / runtimes.length;
+  const averageRuntime =
+    runtimes.reduce((acc, cur) => acc + cur, 0) / runtimes.length;
 
   console.log(`${fn.name}: ${lastResult} -- ${averageRuntime}ms`);
+}
+
+function hrTimeToMs(hrTime: [number, number]) {
+  return hrTime[0] * 1000 + hrTime[1] / 1000000;
 }
