@@ -1,5 +1,5 @@
 import * as cloneDeep from 'clone-deep';
-import { run } from './run';
+import { run } from '../run';
 
 type Instruction = 'jmp' | 'acc' | 'nop';
 

@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function part1(input: string[]) {
   return traverse(input, 3, 1);

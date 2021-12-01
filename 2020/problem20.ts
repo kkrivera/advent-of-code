@@ -1,5 +1,4 @@
-import * as cloneDeep from 'clone-deep';
-import { run } from './run';
+import { run } from '../run';
 
 type Side = 'left' | 'right' | 'top' | 'bottom';
 type Rotation = 'CCW' | 'CW';

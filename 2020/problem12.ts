@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 type Bearing = 'N' | 'S' | 'E' | 'W';
 type Rotation = 'L' | 'R';

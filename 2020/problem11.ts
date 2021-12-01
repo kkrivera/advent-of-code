@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function isWithinBounds(input: string[][], i: number, j: number) {
   return i >= 0 && i < input.length && j >= 0 && j < input[i].length;

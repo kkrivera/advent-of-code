@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function toBinStr(input: string, zeroChar: string): string {
   let binStr = '';

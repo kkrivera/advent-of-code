@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function part1(input: number[], preambleLength: number) {
   for (let i = preambleLength; i < input.length; i++) {

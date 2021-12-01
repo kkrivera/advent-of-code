@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function isWithinRange(num: number) {
   return num <= 3 && num >= 1;

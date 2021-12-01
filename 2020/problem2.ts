@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 function part1(inputs: string[]) {
   let count = 0;

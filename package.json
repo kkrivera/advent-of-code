@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "clone-deep": "^4.0.1",
+    "ts-node": "^10.4.0"
+  }
+}

@@ -1,4 +1,4 @@
-import { run } from './run';
+import { run } from '../run';
 
 type PassportKey = 'byr' | 'iyr' | 'eyr' | 'hgt' | 'hcl' | 'ecl' | 'pid' | 'cid';
 const passportKeys: PassportKey[] = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid', 'cid'];
