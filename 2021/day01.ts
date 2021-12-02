@@ -23,5 +23,5 @@ const fullInput = readFileSync("./day01-input", "utf-8")
   .split("\n")
   .map((line) => parseInt(line));
 
-run(part1, fullInput);
-run(part2, fullInput);
+run(part1, fullInput); // part1: 1557 -- 0.0082ms
+run(part2, fullInput); // part2: 1608 -- 0.0504ms
