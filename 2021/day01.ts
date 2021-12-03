@@ -1,4 +1,4 @@
-import { readInput, run } from '../run';
+import { readLines, run } from '../run';
 
 const part1 = (input: number[]) => {
   let increasing = 0;
@@ -18,7 +18,7 @@ const part2 = (input: number[]) => {
   return part1(windowSums);
 };
 
-const fullInput = readInput('./day01-input').map((line) => parseInt(line));
+const fullInput = readLines('./day01-input').map((line) => parseInt(line));
 
 run(part1, fullInput); // part1: 1557 -- 0.0082ms
 run(part2, fullInput); // part2: 1608 -- 0.0504ms

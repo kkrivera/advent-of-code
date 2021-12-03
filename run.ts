@@ -31,6 +31,6 @@ function hrTimeToMs([seconds, nanoseconds]: [number, number]) {
   return seconds * 1000 + nanoseconds / 1000000;
 }
 
-export function readInput(path: string) {
+export function readLines(path: string) {
   return readFileSync(path, 'utf-8').split('\n');
 }

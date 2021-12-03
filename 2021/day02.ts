@@ -1,4 +1,4 @@
-import { readInput, run } from '../run';
+import { readLines, run } from '../run';
 
 type Input = Array<['forward' | 'down' | 'up', number]>;
 
@@ -31,7 +31,7 @@ const part2 = (input: Input) => {
   return horizontal * depth;
 };
 
-const fileInput = readInput('./day02-input').map((line) => {
+const fileInput = readLines('./day02-input').map((line) => {
   const [direction, unitsStr] = line.split(' ');
   return [direction, parseInt(unitsStr)];
 }) as Input;
