@@ -1,4 +1,5 @@
 import * as cloneDeep from 'clone-deep';
+import { readFileSync } from 'fs';
 
 export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Parameters<T>) {
   const runTimes = [];
@@ -28,4 +29,8 @@ export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Paramet
 
 function hrTimeToMs([seconds, nanoseconds]: [number, number]) {
   return seconds * 1000 + nanoseconds / 1000000;
+}
+
+export function readInput(path: string) {
+  return readFileSync(path, 'utf-8').split('\n');
 }
