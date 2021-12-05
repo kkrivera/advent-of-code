@@ -3,7 +3,8 @@ import { readLines, run } from '../run';
 // const marker = 'X';
 type Value = string;
 type Board = Value[][];
-type BoardMarks = { [value: Value]: boolean };
+type BoardMark = { marked: boolean; x: number; y: number };
+type BoardMarks = { [value: Value]: BoardMark };
 type BoardProps = {
   board: Board;
   boardMarks: BoardMarks;
@@ -16,10 +17,9 @@ const part1 = ([calledNumbers, boards]: Input) => {
   for (let i = 0; i < calledNumbers.length; i++) {
     const calledNumber = calledNumbers[i];
     for (let j = 0; j < boards.length; j++) {
-      const board = boards[j];
-      markBoard(board, calledNumber);
-      if (isBoardWinner(board)) {
-        return calculateScore(board, calledNumber);
+      const boardProps = boards[j];
+      if (markBoard(boardProps, calledNumber)) {
+        return calculateScore(boardProps, calledNumber);
       }
     }
   }
@@ -29,11 +29,10 @@ const part2 = ([calledNumbers, boards]: Input) => {
   for (let i = 0; i < calledNumbers.length; i++) {
     const calledNumber = calledNumbers[i];
     for (let j = 0; j < boards.length; j++) {
-      const board = boards[j];
-      markBoard(board, calledNumber);
-      if (isBoardWinner(board)) {
+      const boardProps = boards[j];
+      if (markBoard(boardProps, calledNumber)) {
         if (boards.length === 1) {
-          return calculateScore(board, calledNumber);
+          return calculateScore(boardProps, calledNumber);
         }
 
         boards.splice(j, 1);
@@ -45,58 +44,52 @@ const part2 = ([calledNumbers, boards]: Input) => {
 
 const calculateScore = ({ board, boardMarks }: BoardProps, lastCalledNumber: Value) => {
   const unmarkedSum = board.reduce((boardSum, row) => {
-    return boardSum + row.reduce((rowSum, value) => rowSum + (!boardMarks[value] ? parseInt(value) : 0), 0);
+    return boardSum + row.reduce((rowSum, value) => rowSum + (!boardMarks[value].marked ? parseInt(value) : 0), 0);
   }, 0);
 
   return unmarkedSum * parseInt(lastCalledNumber);
 };
 
-const markBoard = (boardProps: BoardProps, num: Value) => {
+const markBoard = (boardProps: BoardProps, lastCalledNumber: Value) => {
   const { boardMarks } = boardProps;
-  if (boardMarks.hasOwnProperty(num)) {
-    boardMarks[num] = true;
+  if (boardMarks.hasOwnProperty(lastCalledNumber)) {
+    const boardMark = boardMarks[lastCalledNumber];
+    boardMark.marked = true;
     boardProps.totalMarks++;
-  }
-};
 
-const isBoardWinner = ({ board, boardMarks, totalMarks }: BoardProps): boolean => {
-  if (totalMarks < 5) return false;
-
-  // Check Columns
-  const [firstRow] = board;
-  for (let i = 0; i < firstRow.length; i++) {
-    const val = firstRow[i];
-    if (boardMarks[val]) {
-      let isWinner = true;
-
-      for (let j = 1; j < board.length; j++) {
-        if (!boardMarks[board[j][i]]) {
-          isWinner = false;
-          break;
-        }
-      }
-
-      if (isWinner) return true;
-    }
-  }
-
-  // Check rows
-  for (let i = 0; i < board.length; i++) {
-    const row = board[i];
-    if (boardMarks[row[0]]) {
-      let isWinner = true;
-      for (let j = 1; j < row.length; j++) {
-        if (!boardMarks[row[j]]) {
-          isWinner = false;
-          break;
-        }
-      }
-
-      if (isWinner) return true;
-    }
+    // Check Win Condition only if there are 4 or more total marks
+    if (boardProps.totalMarks > 4) return isBoardWinner(boardProps, lastCalledNumber);
   }
 
   return false;
+};
+
+const isBoardWinner = (boardProps: BoardProps, lastCalledNumber: Value) => {
+  return isRowWinner(boardProps, lastCalledNumber) || isColWinner(boardProps, lastCalledNumber);
+};
+
+const isRowWinner = (boardProps: BoardProps, lastCalledNumber: Value) => {
+  return isDirWinner(boardProps, lastCalledNumber, -1, 0) && isDirWinner(boardProps, lastCalledNumber, 1, 0);
+};
+
+const isColWinner = (boardProps: BoardProps, lastCalledNumber: Value) => {
+  return isDirWinner(boardProps, lastCalledNumber, 0, -1) && isDirWinner(boardProps, lastCalledNumber, 0, 1);
+};
+
+const isDirWinner = ({ board, boardMarks }: BoardProps, lastCalledNumber: Value, xStep: number, yStep: number) => {
+  const [firstRow] = board;
+  let { x, y } = boardMarks[lastCalledNumber];
+
+  // Skip current board mark because we just marked it
+  x += xStep;
+  y += yStep;
+
+  while (x >= 0 && x < firstRow.length && y >= 0 && y < board.length) {
+    if (!boardMarks[board[y][x]].marked) return false;
+    x += xStep;
+    y += yStep;
+  }
+  return true;
 };
 
 function processInput(input: string[]): Input {
@@ -107,9 +100,9 @@ function processInput(input: string[]): Input {
   for (let i = 2; i < input.length; i++) {
     const line = input[i];
     if (line) {
-      const gameRow = line.trim().split(/ +/);
-      board.push(gameRow);
-      gameRow.forEach((value) => (boardMarks[value] = false));
+      const row = line.trim().split(/ +/);
+      const y = board.push(row) - 1;
+      row.forEach((value, x) => (boardMarks[value] = { marked: false, x, y }));
     }
 
     if (!line || i + 1 === input.length) {
@@ -124,5 +117,5 @@ function processInput(input: string[]): Input {
 
 const processedInput = processInput(readLines('./day04-input'));
 
-run(part1, processedInput); // part1: 39902 -- 0.243ms
-run(part2, processedInput); // part2: 26936 -- 0.7492ms
+run(part1, processedInput); // part1: 39902 -- 0.0899ms
+run(part2, processedInput); // part2: 26936 -- 0.1963ms
