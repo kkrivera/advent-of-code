@@ -1,6 +1,6 @@
 import { readLines, run } from '../run';
 
-type MarkedCoordinates = { [key: string]: number };
+type MarkedCoordinates = { [x: number]: { [y: number]: number } };
 type Point = [number, number];
 type Line = [Point, Point];
 type Input = Line[];
@@ -32,15 +32,18 @@ const traverseAndMarkCoordinates = ([[x1, y1], [x2, y2]]: Line, markedCoordinate
 
   let [x, y] = [x1, y1];
   while (x !== x2 + xStep || y !== y2 + yStep) {
-    const pointStr = `${x},${y}`;
-    markedCoordinates[pointStr] ??= 0;
-    markedCoordinates[pointStr]++;
+    const yMarkedCoordinates = (markedCoordinates[x] ??= {});
+    yMarkedCoordinates[y] ??= 0;
+    yMarkedCoordinates[y]++;
     (x += xStep), (y += yStep);
   }
 };
 
 const countOverlaps = (markedCoordinates: MarkedCoordinates): number => {
-  return Object.values(markedCoordinates).reduce((acc, count) => acc + (count > 1 ? 1 : 0), 0);
+  return Object.values(markedCoordinates).reduce((acc, yCounts) => {
+    const yCount = Object.values(yCounts).reduce((acc1, count) => acc1 + (count > 1 ? 1 : 0), 0);
+    return acc + yCount;
+  }, 0);
 };
 
 const processInput = (input: string[]): Input => {
@@ -55,5 +58,5 @@ const processInput = (input: string[]): Input => {
 
 const processedInput = processInput(readLines('./day05-input'));
 
-run(part1, processedInput); // part1: 5145 -- 41.612ms
-run(part2, processedInput); // part2: 16518 -- 78.535ms
+run(part1, processedInput); // part1: 5145 -- 8.5563m
+run(part2, processedInput); // part2: 16518 -- 13.9256ms

@@ -81,13 +81,11 @@ const isDirWinner = ({ board, boardMarks }: BoardProps, lastCalledNumber: Value,
   let { x, y } = boardMarks[lastCalledNumber];
 
   // Skip current board mark because we just marked it
-  x += xStep;
-  y += yStep;
+  (x += xStep), (y += yStep);
 
   while (x >= 0 && x < firstRow.length && y >= 0 && y < board.length) {
     if (!boardMarks[board[y][x]].marked) return false;
-    x += xStep;
-    y += yStep;
+    (x += xStep), (y += yStep);
   }
   return true;
 };
