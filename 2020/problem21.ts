@@ -1,3 +1,5 @@
+import {} from '../run';
+
 interface Input {
   ingredients: string[];
   allergens: string[];
@@ -8,24 +10,16 @@ function part1(input: Input[]) {
     food.allergens.forEach((allergen) => {
       if (!acc[allergen]) acc[allergen] = [...food.ingredients];
       else {
-        acc[allergen] = acc[allergen].filter((ingredient) =>
-          food.ingredients.includes(ingredient)
-        );
+        acc[allergen] = acc[allergen].filter((ingredient) => food.ingredients.includes(ingredient));
       }
     });
     return acc;
   }, {} as { [allergen: string]: string[] });
 
   const visited = new Set<string>();
-  while (
-    Object.values(ingredientsByAllergen).reduce(
-      (acc, { length }) => acc || length > 1,
-      false
-    )
-  ) {
+  while (Object.values(ingredientsByAllergen).reduce((acc, { length }) => acc || length > 1, false)) {
     const nextAllergen = Object.keys(ingredientsByAllergen).find(
-      (allergen) =>
-        ingredientsByAllergen[allergen].length === 1 && !visited.has(allergen)
+      (allergen) => ingredientsByAllergen[allergen].length === 1 && !visited.has(allergen)
     );
     visited.add(nextAllergen);
 
@@ -35,18 +29,13 @@ function part1(input: Input[]) {
       .filter((allergen) => !visited.has(allergen))
       .forEach((allergen) => {
         const ingredients = ingredientsByAllergen[allergen];
-        const ingredientPos = ingredients.findIndex(
-          (ingredient) => ingredient === ingredientToRemove
-        );
+        const ingredientPos = ingredients.findIndex((ingredient) => ingredient === ingredientToRemove);
         if (ingredientPos > -1) ingredients.splice(ingredientPos, 1);
       });
   }
 
   const ingredientsWithAllergens = new Set<string>(
-    Object.values(ingredientsByAllergen).reduce(
-      (acc, ingredients) => [...acc, ...ingredients],
-      []
-    )
+    Object.values(ingredientsByAllergen).reduce((acc, ingredients) => [...acc, ...ingredients], [])
   );
 
   console.log(
@@ -58,12 +47,7 @@ function part1(input: Input[]) {
   );
 
   return input.reduce((acc, { ingredients }) => {
-    return (
-      acc +
-      ingredients.filter(
-        (ingredient) => !ingredientsWithAllergens.has(ingredient)
-      ).length
-    );
+    return acc + ingredients.filter((ingredient) => !ingredientsWithAllergens.has(ingredient)).length;
   }, 0);
 }
 

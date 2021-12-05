@@ -32,10 +32,7 @@ function toBin(dec: number): number[] {
 
 function toDec(bin: number[]) {
   const powOffset = bin.length - 1;
-  return bin.reduce(
-    (acc, val, power) => acc + val * Math.pow(2, powOffset - power),
-    0
-  );
+  return bin.reduce((acc, val, power) => acc + val * Math.pow(2, powOffset - power), 0);
 }
 
 function extrapolateBin(pow: number) {

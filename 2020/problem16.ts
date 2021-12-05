@@ -1,3 +1,5 @@
+import {} from '../run';
+
 interface Range {
   min: number;
   max: number;
@@ -70,10 +72,7 @@ function part1(input: Input) {
   const sum = input.nearbyTickets.reduce((invalidTicketSum, ticket, i) => {
     let ticketInvalid = false;
     ticket.forEach((ticketNum) => {
-      const isValid = joinedRanges.reduce(
-        (valid, { min, max }) => valid || isWithinRange(ticketNum, min, max),
-        false
-      );
+      const isValid = joinedRanges.reduce((valid, { min, max }) => valid || isWithinRange(ticketNum, min, max), false);
 
       if (!isValid) {
         invalidTicketSum += ticketNum;
@@ -97,29 +96,22 @@ function part2(input: Input) {
     input.nearbyTickets.splice(toSplice[i], 1);
   }
 
-  const nearbyTicketPossibilities: Set<string>[][] = input.nearbyTickets.reduce(
-    (acc, ticket) => {
-      const possibilities = ticket.reduce((acc1, ticketNum, i) => {
-        const possibleKeys = input.rules.reduce((acc2, { key, ranges }) => {
-          const isValid = ranges.reduce(
-            (valid, { min, max }) =>
-              valid || isWithinRange(ticketNum, min, max),
-            false
-          );
+  const nearbyTicketPossibilities: Set<string>[][] = input.nearbyTickets.reduce((acc, ticket) => {
+    const possibilities = ticket.reduce((acc1, ticketNum, i) => {
+      const possibleKeys = input.rules.reduce((acc2, { key, ranges }) => {
+        const isValid = ranges.reduce((valid, { min, max }) => valid || isWithinRange(ticketNum, min, max), false);
 
-          // Push the key if the ticket number is valid
-          if (isValid) acc2.add(key);
-          return acc2;
-        }, new Set<string>());
+        // Push the key if the ticket number is valid
+        if (isValid) acc2.add(key);
+        return acc2;
+      }, new Set<string>());
 
-        acc1.push(possibleKeys);
-        return acc1;
-      }, [] as Set<string>[]);
-      acc.push(possibilities);
-      return acc;
-    },
-    [] as Set<string>[][]
-  );
+      acc1.push(possibleKeys);
+      return acc1;
+    }, [] as Set<string>[]);
+    acc.push(possibilities);
+    return acc;
+  }, [] as Set<string>[][]);
 
   const foundKeys = new Set<string>();
   const foundIdx = new Set<number>();

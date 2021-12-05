@@ -21,11 +21,7 @@ function evaluate(input: string): number {
         if (subChar === '(') {
           depth++;
         } else if (subChar === ')' && --depth === 0) {
-          result = performOperation(
-            result,
-            operator,
-            evaluate(input.slice(i + 1, j))
-          );
+          result = performOperation(result, operator, evaluate(input.slice(i + 1, j)));
           i = j;
           break;
         }
@@ -49,10 +45,7 @@ function evaluatePlusFirst(input: string): number {
         if (subChar === '(') {
           depth++;
         } else if (subChar === ')' && --depth === 0) {
-          input =
-            input.slice(0, i) +
-            evaluatePlusFirst(input.slice(i + 1, j)) +
-            input.slice(j + 1);
+          input = input.slice(0, i) + evaluatePlusFirst(input.slice(i + 1, j)) + input.slice(j + 1);
 
           // Rewind to check prior operator
           i -= 2;
@@ -79,10 +72,7 @@ function evaluatePlusFirst(input: string): number {
         const result = parseInt(left) + parseInt(right);
 
         // Replace addition strings with resulting value
-        input =
-          input.slice(0, i - left.length) +
-          result +
-          input.slice(i + right.length + 1);
+        input = input.slice(0, i - left.length) + result + input.slice(i + right.length + 1);
 
         // Rewind to evaluate prior characters
         i--;

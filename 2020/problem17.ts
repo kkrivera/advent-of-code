@@ -1,3 +1,5 @@
+import {} from '../run';
+
 type State = '#' | '.';
 interface Point {
   x: number;
@@ -19,11 +21,7 @@ function iter3d<T>(box: T[][][], onCell: (val: T, point: Point) => void) {
   }
 }
 
-function about3d(
-  center: Point,
-  onPoint: (x: number, y: number, z: number) => void,
-  range: number = 1
-) {
+function about3d(center: Point, onPoint: (x: number, y: number, z: number) => void, range: number = 1) {
   const { x, y, z } = center;
   for (let i = -range; i <= range; i++) {
     for (let j = -range; j <= range; j++) {
@@ -35,11 +33,7 @@ function about3d(
   }
 }
 
-function about4d(
-  center: Point4d,
-  onPoint: (x: number, y: number, z: number, w: number) => void,
-  range: number = 1
-) {
+function about4d(center: Point4d, onPoint: (x: number, y: number, z: number, w: number) => void, range: number = 1) {
   const { x, y, z, w } = center;
   for (let i = -range; i <= range; i++) {
     for (let j = -range; j <= range; j++) {
@@ -85,10 +79,7 @@ function cycle(box: State[][][]): State[][][] {
 
         if (state === '.' && activeNeighbors === 3) {
           state = '#';
-        } else if (
-          state === '#' &&
-          (activeNeighbors < 2 || activeNeighbors > 3)
-        ) {
+        } else if (state === '#' && (activeNeighbors < 2 || activeNeighbors > 3)) {
           state = '.';
         }
 
@@ -124,10 +115,7 @@ function cycle4d(boxes: State[][][][]): State[][][][] {
 
           if (state === '.' && activeNeighbors === 3) {
             state = '#';
-          } else if (
-            state === '#' &&
-            (activeNeighbors < 2 || activeNeighbors > 3)
-          ) {
+          } else if (state === '#' && (activeNeighbors < 2 || activeNeighbors > 3)) {
             state = '.';
           }
 
@@ -158,8 +146,6 @@ function part2(input: State[][][]) {
     input4d = cycle4d(input4d);
   }
 
-//   console.log(JSON.stringify(input4d, null, 2));
-
   let activeCubes = 0;
   for (let w = 0; w < input4d.length; w++) {
     iter3d(input4d[w], (state) => (activeCubes += state === '#' ? 1 : 0));
@@ -181,9 +167,7 @@ const exampleInput1 = `.#.
 ..#
 ###`;
 
-const input: State[][][] = [
-    providedInput.split('\n').map((line) => line.split('') as State[]),
-];
+const input: State[][][] = [providedInput.split('\n').map((line) => line.split('') as State[])];
 
 console.log(part1(input));
 console.log(part2(input));
