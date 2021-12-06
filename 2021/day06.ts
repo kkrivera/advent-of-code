@@ -51,12 +51,9 @@ const part2 = (input: Input, passes: number) => {
 };
 
 const [fullInput] = readLines('./day06-input');
-
-const exampleInput = `3,4,3,1,2`;
-
 const processInput = (input: string) => {
   return input.split(',').map((num) => parseInt(num));
 };
 
-console.log(part1(processInput(fullInput), 80));
-console.log(part2(processInput(fullInput), 256));
+run(part1, processInput(fullInput), 80); // part1: 345793 -- 40.8331ms
+run(part2, processInput(fullInput), 256); // part2: 1572643095893 -- 0.1181ms
