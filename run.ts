@@ -31,6 +31,10 @@ function hrTimeToMs([seconds, nanoseconds]: [number, number]) {
   return seconds * 1000 + nanoseconds / 1000000;
 }
 
-export function readLines(pathOrContent: string, isFileContents: boolean = false) {
-  return (isFileContents ? pathOrContent : readFileSync(pathOrContent, 'utf-8')).split('\n');
+export function readLines(
+  pathOrContent: string,
+  { isFileContents = false }: Partial<{ isFileContents: boolean }> = {}
+) {
+  const fileContents = isFileContents ? pathOrContent : readFileSync(pathOrContent, 'utf-8');
+  return fileContents.split('\n');
 }
