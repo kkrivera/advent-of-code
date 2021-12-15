@@ -38,3 +38,7 @@ export function readLines(
   const fileContents = isFileContents ? pathOrContent : readFileSync(pathOrContent, 'utf-8');
   return fileContents.split('\n');
 }
+
+export function displayGrid(input: any[][], delimiter: string = '') {
+  input.forEach((row) => console.log(row.join(delimiter)));
+}
