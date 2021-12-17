@@ -31,14 +31,15 @@ function hrTimeToMs([seconds, nanoseconds]: [number, number]) {
   return seconds * 1000 + nanoseconds / 1000000;
 }
 
-export function readLines(
-  pathOrContent: string,
-  { isFileContents = false }: Partial<{ isFileContents: boolean }> = {}
-) {
+export function readLines(pathOrContent: string, { isFileContents = false }: Partial<{ isFileContents: boolean }> = {}) {
   const fileContents = isFileContents ? pathOrContent : readFileSync(pathOrContent, 'utf-8');
   return fileContents.split('\n');
 }
 
 export function displayGrid(input: any[][], delimiter: string = '') {
   input.forEach((row) => console.log(row.join(delimiter)));
+}
+
+export function spacer(num: number = 1) {
+  return Array.from({ length: num * 4 }, () => ' ').join('');
 }
