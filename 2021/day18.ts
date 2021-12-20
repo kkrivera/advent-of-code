@@ -1,4 +1,5 @@
-import { readLines, log, isNil } from '../run';
+import { isNil, readLines, run } from '../run';
+import * as cloneDeep from 'clone-deep';
 
 const BASE_DEPTH = 0;
 const EXPLODE_DEPTH = 4;
@@ -27,41 +28,78 @@ const part1 = (input: Input) => {
     right.parent = addition;
     right.position = 'right';
 
-    console.log('\n++++ ADDITION +++++');
-    display(addition);
-
     traverse(addition, (snailNumber) => {
       if (typeof snailNumber === 'object') {
         snailNumber.depth++;
       }
     });
+    top = addition;
 
-    let leftMostActionPerformed = true;
-    while (leftMostActionPerformed) {
-      leftMostActionPerformed = false;
-      try {
-        traverse(addition, (snailNumber, fromPosition, fromParent) => {
-          if (typeof snailNumber === 'object') {
-            if (snailNumber.depth >= EXPLODE_DEPTH) {
+    let hasExploded: boolean = true;
+    let hasSplit: boolean = true;
+    while (hasExploded || hasSplit) {
+      hasExploded = false;
+      hasSplit = false;
+
+      let continueExploding = true;
+      while (continueExploding) {
+        continueExploding = false;
+        try {
+          traverse(top, (snailNumber) => {
+            if (typeof snailNumber === 'object' && snailNumber.depth >= EXPLODE_DEPTH) {
               explode(snailNumber);
+              continueExploding = true;
               throw 'explode';
             }
-          } else if (snailNumber >= SPLIT_NUM) {
-            split([fromParent, fromPosition]);
-            throw 'split';
-          }
-        });
-      } catch (e) {
-        leftMostActionPerformed = true;
+          });
+        } catch (e) {
+          if (e === 'explode') hasExploded = true;
+        }
+      }
+
+      let continueSplitting: boolean = true;
+      while (continueSplitting) {
+        continueSplitting = false;
+        try {
+          traverse(top, (snailNumber, fromPosition, fromParent) => {
+            if (typeof snailNumber === 'number' && snailNumber >= SPLIT_NUM) {
+              split([fromParent, fromPosition]);
+              continueSplitting = true;
+              throw 'split';
+            }
+          });
+        } catch (e) {
+          hasSplit = true;
+        }
       }
     }
-
-    top = addition;
   }
 
-  console.log('');
-  //   log(top);
-  display(top);
+  return calculatSum(top);
+};
+
+const part2 = (input: string[]) => {
+  let sum = Number.MIN_SAFE_INTEGER;
+
+  for (let i = 0; i < input.length; i++) {
+    for (let j = 1; j < input.length; j++) {
+      const a = processInput([input[i], input[j]]);
+      const b = processInput([input[j], input[i]]);
+
+      const forwardSum = part1(a);
+      if (forwardSum > sum) sum = forwardSum;
+
+      const reverseSum = part1(b);
+      if (reverseSum > sum) sum = reverseSum;
+    }
+  }
+
+  return sum;
+};
+
+const calculatSum = (num: SnailNumber) => {
+  const [left, right] = [num.left, num.right];
+  return 3 * (typeof left === 'number' ? left : calculatSum(left)) + 2 * (typeof right === 'number' ? right : calculatSum(right));
 };
 
 const traverse = (num: SnailNumber, onFind: (num: number | SnailNumber, fromPosition: Position, parent: SnailNumber) => void) => {
@@ -74,17 +112,12 @@ const traverse = (num: SnailNumber, onFind: (num: number | SnailNumber, fromPosi
   onFind(right, 'right', num);
 };
 
-const display = (num: number | SnailNumber) => {
-  console.log(format(num));
-};
-
 const split = (config: SplitConfig) => {
   const [parent, position] = config;
 
   const num = parent[position];
   if (typeof num === 'object') return;
 
-  console.log(`\n^^^^^ SPLIT ${num} ^^^^^`);
   const splitNum = num / 2;
   const snailNumber: SnailNumber = {
     depth: parent.depth + 1,
@@ -95,21 +128,21 @@ const split = (config: SplitConfig) => {
     id: random(),
   };
 
-  console.log('---', format(parent), '-->', format(snailNumber));
-  console.log('+++', format(getTop(parent)));
   parent[position] = snailNumber;
-  console.log('==>', format(getTop(snailNumber)));
+
+  if (snailNumber.depth >= EXPLODE_DEPTH) {
+    explode(snailNumber);
+  }
 };
 
 const explode = (snailNumber: SnailNumber) => {
   if (typeof snailNumber !== 'object') return [];
-  console.log(`\n==== EXPLODE ${format(snailNumber)} ====`);
-  console.log('+++', format(getTop(snailNumber)));
 
   if (typeof snailNumber.left === 'object' || typeof snailNumber.right === 'object') {
     throw 'Bad explosion';
   }
 
+  const resultIds: string[] = [];
   const left = snailNumber.left;
   /**************
    * EXPLODE LEFT
@@ -121,6 +154,7 @@ const explode = (snailNumber: SnailNumber) => {
     if (ascendingLeft) {
       if (typeof nextLeft.left === 'number') {
         nextLeft.left += left;
+        resultIds.push(nextLeft.id);
         break;
       } else if (beforeLeft.id !== nextLeft.left.id) {
         ascendingLeft = false;
@@ -133,6 +167,7 @@ const explode = (snailNumber: SnailNumber) => {
     } else {
       if (typeof nextLeft.right === 'number') {
         nextLeft.right += left;
+        resultIds.push(nextLeft.id);
         break;
       } else {
         beforeLeft = nextLeft;
@@ -152,6 +187,7 @@ const explode = (snailNumber: SnailNumber) => {
     if (ascendingRight) {
       if (typeof nextRight.right === 'number') {
         nextRight.right += right;
+        resultIds.push(nextRight.id);
         break;
       } else if (beforeRight.id !== nextRight.right.id) {
         ascendingRight = false;
@@ -164,6 +200,7 @@ const explode = (snailNumber: SnailNumber) => {
     } else {
       if (typeof nextRight.left === 'number') {
         nextRight.left += right;
+        resultIds.push(nextRight.id);
         break;
       } else {
         beforeRight = nextRight;
@@ -174,12 +211,15 @@ const explode = (snailNumber: SnailNumber) => {
 
   // Finally
   snailNumber.parent[snailNumber.position] = 0;
-  console.log('==>', format(getTop(snailNumber)));
 };
 
-const format = (num: number | SnailNumber) => {
+const format = (num: number | SnailNumber, ...wrapId: string[]) => {
   if (typeof num === 'number') return num;
-  return `[${format(num.left)},${format(num.right)}]`;
+
+  let disp = `[${format(num.left, ...wrapId)},${format(num.right, ...wrapId)}]`;
+  if (wrapId.includes(num.id)) disp = `\x1b[31m${disp}\x1b[0m`;
+
+  return disp;
 };
 
 const getTop = (snailNumber: SnailNumber) => {
@@ -218,49 +258,6 @@ const toSnailNumber = (base: BaseSnailNumber, depth: number = BASE_DEPTH): Snail
   return snailNumber;
 };
 
-// [[[[1,1], [2,2]], [3,3]], [4,4]]
-const exampleInput1 = `[1,1]
-[2,2]
-[3,3]
-[4,4]`.split('\n');
-
-// [[[[3,0], [5,3]], [4,4]], [5,5]]
-const exampleInput2 = `[1,1]
-[2,2]
-[3,3]
-[4,4]
-[5,5]`.split('\n');
-
-// [[[[5,0],[7,4]],[5,5]],[6,6]]
-const exampleInput3 = `[1,1]
-[2,2]
-[3,3]
-[4,4]
-[5,5]
-[6,6]`.split('\n');
-
-// [[[[0,7],4],[[7,8],[6,0]]],[8,1]]
-const myExample = `[[[[4,3],4],4],[7,[[8,4],9]]]
-[1,1]`.split('\n');
-
-// [[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]
-const exampleInput4 = `[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
-[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
-[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
-[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]
-[7,[5,[[3,8],[1,4]]]]
-[[2,[2,2]],[8,[8,1]]]
-[2,9]
-[1,[[[9,3],9],[[9,0],[0,7]]]]
-[[[5,[7,4]],7],1]
-[[[[4,2],2],6],[8,7]]`.split('\n');
-
-// [[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]
-const p1 = `[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
-[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]`.split('\n');
-
-// [[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]
-const p2 = `[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]
-[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]`.split('\n');
-
-console.log(part1(processInput(p1)));
+const fullInput = readLines('./day18-input');
+run(part1, processInput(fullInput)); // part1: 3524 -- 33.028ms
+run(part2, fullInput); // part2: 4656 -- 570.2361ms

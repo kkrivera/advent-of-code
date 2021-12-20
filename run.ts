@@ -6,7 +6,7 @@ export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Paramet
   const runTimes = [];
   let lastResult;
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 1; i++) {
     const clonedInputs = cloneDeep(inputs);
     const start = process.hrtime();
     const result = fn(...clonedInputs);
