@@ -1,5 +1,6 @@
 import * as cloneDeep from 'clone-deep';
 import { readFileSync } from 'fs';
+import { inspect } from 'util';
 
 export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Parameters<T>) {
   const runTimes = [];
@@ -42,4 +43,12 @@ export function displayGrid(input: any[][], delimiter: string = '') {
 
 export function spacer(num: number = 1) {
   return Array.from({ length: num * 4 }, () => ' ').join('');
+}
+
+export function log(...objs: any[]) {
+  console.log(...objs.map((obj) => inspect(obj, false, null, true)));
+}
+
+export function isNil(obj: unknown) {
+  return obj === null || obj === undefined;
 }
