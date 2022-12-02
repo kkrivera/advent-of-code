@@ -1,4 +1,4 @@
-import { readLines, run } from '../run';
+import { readLines, run } from '../run-deno.ts';
 
 const sumArray = (input: number[]) => {
   return input.reduce((sum, num) => sum + num, 0);
@@ -23,7 +23,7 @@ const { arr: fullInput } = readLines('./day01-input').reduce(
     else (acc.arr[acc.idx] ??= []).push(parseInt(line));
     return acc;
   },
-  { arr: [], idx: 0 }
+  { arr: [] as number[][], idx: 0 }
 );
 
 run(part1, fullInput);
