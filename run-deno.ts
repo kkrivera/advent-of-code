@@ -46,5 +46,5 @@ export function isNil(obj: unknown) {
 }
 
 export function log(...objs: any[]) {
-  console.log(...objs.map((obj) => Deno.inspect(obj, { colors: true })));
+  console.log(...objs.map((obj) => Deno.inspect(obj, { colors: true, depth: 6 })));
 }
