@@ -25,10 +25,7 @@ export function run<T extends (...args: any[]) => any>(fn: T, ...inputs: Paramet
   console.log(`${fn.name}: ${lastResult} -- ${reducedPrecisionAverageRunTime}ms`);
 }
 
-export function readLines(
-  pathOrContent: string,
-  { isFileContents = false }: Partial<{ isFileContents: boolean }> = {}
-) {
+export function readLines(pathOrContent: string, { isFileContents = false }: Partial<{ isFileContents: boolean }> = {}) {
   const fileContents = isFileContents ? pathOrContent : Deno.readTextFileSync(pathOrContent);
   return fileContents.split('\n');
 }
@@ -48,3 +45,4 @@ export function isNil(obj: unknown) {
 export function log(...objs: any[]) {
   console.log(...objs.map((obj) => Deno.inspect(obj, { colors: true, depth: 6 })));
 }
+
